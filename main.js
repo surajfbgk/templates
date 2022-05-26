@@ -5,7 +5,20 @@ window.addEventListener("load",(e)=>{
     var check=document.getElementById("check");
     var model=document.getElementById("model");
     var modelimg=document.getElementById("img");
+    var a=document.getElementById("download");
     
+    function imgdownload(url){
+        fetch(url).then((res)=>res.blob()).then((data)=>{
+            var blob=URL.createObjectURL(data);
+            a.href=blob;
+            setTimeout(()=>{
+                URL.revokeObjectURL(blob);
+            },8000)
+            
+        });
+    }
+
+
     function allStorage() {
         var values = [],
             keys = Object.keys(localStorage),
@@ -43,6 +56,7 @@ window.addEventListener("load",(e)=>{
     var ar=allStorages();
     function handleClick (e){
         modelimg.src=e.target.src;
+        imgdownload(e.target.src);
         model.style.display="block";
         
     };
@@ -56,6 +70,7 @@ window.addEventListener("load",(e)=>{
         const searchid = Math.random().toString(36).substring(2,7);
        var searchVal=search.value;
        if (ar.some((v)=>v==searchVal) || searchVal=="") {
+           container.innerHTML="";
            loadimg();
            return true;
        }
@@ -81,6 +96,7 @@ window.addEventListener("load",(e)=>{
            loadimg();
        });
     });
+
     function loadimg(){
         var number=allStorage();
     for (var imgurl of number) {
