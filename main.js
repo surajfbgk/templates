@@ -1,26 +1,30 @@
 window.addEventListener("load",(e)=>{
+    var container=document.getElementById("content");
+    var inputSearch=document.getElementById("search");
     var img=document.getElementById("img");
-    var btn=document.getElementById("btn");
-    var input=document.getElementById("search");
-    var container=document.querySelector(".row");
-    var model=document.getElementById("model");
     var download=document.getElementById("download");
-    var check=document.getElementById("check");
+    var downloadImg=document.querySelector(".download");
 
-    function firstDisplay(params){
-        container.innerHTML="";
-        params.forEach(element => {
-                   var card=document.createElement("div");
-                   var img=document.createElement("img");
-                    card.setAttribute("class","col-md-6 col-xl-3 mt-5 items");
-                    img.src=element;
-                    img.addEventListener("click",handleClick);
-                    card.appendChild(img);
-                    container.appendChild(card);
-               });    ;
+    var data=Object.values(localStorage);
+    function getAlldata(x){
+        var arr;
+        if (x!=null) {
+            arr=x.split(",");
+            return arr;
+        }else{
+            arr=data[0].split(",");
+            return arr;
+        }
+        
     }
 
+    firstDisplay(getAlldata());
+
     function handleClick(e){
+        if (model.style.display=="block"){
+            model.style.display="none";
+            return;
+        }
         var imgsrc=e.target.src;
         model.style.display="block";
         img.src=imgsrc;
@@ -30,76 +34,67 @@ window.addEventListener("load",(e)=>{
         }).catch((err)=>console.log(err));
     }
 
-    
-    download.addEventListener("click",(e)=>{
-        setTimeout(()=>{
-            URL.revokeObjectURL(e.target.href);
-        },5000);
+    function firstDisplay(params){
+        container.innerHTML="";
+        params.forEach(element => {
+                   var card=document.createElement("div");
+                   var img=document.createElement("img");
+                    card.setAttribute("class","item");
+                    img.src=element;
+                    img.addEventListener("click",handleClick);
+                    card.appendChild(img);
+                    container.appendChild(card);
+               });
+    }
+
+    downloadImg.addEventListener("click",(e)=>{
+        e.stopPropagation();
+        download.click();
     });
 
-    function closeModel(){
-        model.style.display="none";
+    function getStorage(val){
+        var d=localStorage.getItem(val);
+        firstDisplay(getAlldata(d));
     }
-
-    img.addEventListener("click",closeModel);
-    check.addEventListener("change",closeModel);
-
-    function getStorage(){
-        var obj=Object.values(localStorage);
-        return obj;
+    
+    function savetoStorage(x,y){
+        var objs=[];
+        x.forEach((v)=>{
+            objs.push(v.src.large);
+        });
+        localStorage.setItem(y,objs);
     }
-
 
     function putData(params,searchkey){
         container.innerHTML="";
+        savetoStorage(params,searchkey);
         params.forEach(element => {
             const result = Math.random().toString(36).substring(2,6);
-                   var key=searchkey+result;
-                   localStorage.setItem(key,element.src.large);
                    var card=document.createElement("div");
                    var img=document.createElement("img");
-                    card.setAttribute("class","col-md-6 col-xl-3 mt-5 items");
+                    card.setAttribute("class","item");
                     img.src=element.src.large;
                     img.addEventListener("click",handleClick);
                     card.appendChild(img);
                     container.appendChild(card);
                });    
     }
-
-    var filter,txtValue;
-    var obj=container.childNodes;
-    input.addEventListener("keyup",(e)=>{
-        // filter=e.target.value.toUpperCase();
-        // for (var i=1;i<obj.length;i++) {
-        //     txtValue = obj[i].textContent || obj.innerText;
-        //     if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        //         obj[i].style.display = "";
-        //       } else {
-        //         obj[i].style.display = "none";
-        //       }     
-        // }
-    });
-
-    function checkData(x){
-        var keys=Object.values(sessionStorage);
-        var rs=keys.filter((v)=>v==x);
-        if (rs!=[]) {
-            var ks=Object.keys(localStorage)
-            for (let i = 0; i < ks.length; i++) {
-                console.log(i);
-            }
+    var keys=Object.keys(localStorage);
+    function checkSearch(x){
+        var test=keys.filter((v)=>v==x);
+        if (test!=""){
+            getStorage(test[0]);
             return true;
         }else{
             return false;
-        }
+        };
+        
     }
 
-    btn.addEventListener("click",(e)=>{
-        var search=input.value;
+    inputSearch.addEventListener("change",(e)=>{
+        var search=e.target.value;
         if(search=="")return;
-        const result = Math.random().toString(36).substring(2,6);
-        if(checkData(search)) return;
-        sessionStorage.setItem(result,search);
+        if(checkSearch(search)) return;
         var url=`https://api.pexels.com/v1/search?page=1&query=${search}`;
         fetch(url,{
             method:"GET",
@@ -111,5 +106,5 @@ window.addEventListener("load",(e)=>{
         })         
     });
 
-   firstDisplay(getStorage()) ;
+
 });
