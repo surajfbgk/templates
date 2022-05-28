@@ -4,7 +4,21 @@ window.addEventListener("load",(e)=>{
     var img=document.getElementById("img");
     var download=document.getElementById("download");
     var downloadImg=document.querySelector(".download");
+    var pagination=document.querySelectorAll(".pagination");
+    var pageDiv=document.getElementById("pagination");
 
+    pagination.forEach((v)=>{
+        v.addEventListener("click",(e)=>{
+            e.preventDefault();
+            if (inputSearch.value!="") {
+                searchData(inputSearch.value,e.target.innerText);    
+            }else{
+                searchData("india",e.target.innerText);    
+            }
+            
+            e.target.style.backgroundColor="red";
+        });
+    });
     var data=Object.values(localStorage);
     function getAlldata(x){
         var arr;
@@ -14,14 +28,13 @@ window.addEventListener("load",(e)=>{
         }else{
             arr=data[0].split(",");
             return arr;
-        }
-        
+        } 
     }
+
     if (data!="") {
         firstDisplay(getAlldata());    
     }
     
-
     function handleClick(e){
         if (model.style.display=="block"){
             model.style.display="none";
@@ -47,6 +60,7 @@ window.addEventListener("load",(e)=>{
                     card.appendChild(img);
                     container.appendChild(card);
                });
+               pageDiv.style.visibility="visible";
     }
 
     downloadImg.addEventListener("click",(e)=>{
@@ -80,6 +94,7 @@ window.addEventListener("load",(e)=>{
                     card.appendChild(img);
                     container.appendChild(card);
                });    
+               pageDiv.style.visibility="visible";
     }
     var keys=Object.keys(localStorage);
     function checkSearch(x){
@@ -89,15 +104,17 @@ window.addEventListener("load",(e)=>{
             return true;
         }else{
             return false;
-        };
-        
+        };    
     }
 
-    inputSearch.addEventListener("change",(e)=>{
-        var search=e.target.value;
+    function searchData(search,pageno){
+        var url;
         if(search=="")return;
-        if(checkSearch(search)) return;
-        var url=`https://api.pexels.com/v1/search?page=1&query=${search}`;
+        if (pageno==null) {
+            if(checkSearch(search)) return;
+            url=`https://api.pexels.com/v1/search?page=1&query=${search}`;    
+        }
+        url=`https://api.pexels.com/v1/search?page=${pageno}&query=${search}`;
         fetch(url,{
             method:"GET",
             headers:{"Authorization":"563492ad6f917000010000013dfe20610936485eb1672aec5d09b6f3"}
@@ -106,7 +123,10 @@ window.addEventListener("load",(e)=>{
         }).catch((err)=>{
             console.log(err);
         })         
+    }
+    inputSearch.addEventListener("change",(e)=>{
+        var search=e.target.value;
+        searchData(search)
     });
-
 
 });
