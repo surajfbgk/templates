@@ -17,8 +17,10 @@ window.addEventListener("load",(e)=>{
         }
         
     }
-
-    firstDisplay(getAlldata());
+    if (data!="") {
+        firstDisplay(getAlldata());    
+    }
+    
 
     function handleClick(e){
         if (model.style.display=="block"){
